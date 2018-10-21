@@ -39,33 +39,28 @@ class TextEditor {
         return allSelectedElements;
     }
 
-
-    
-
     delegateEvents(event) {
         switch (event.target.tagName) {
-            case 'BUTTON': {
-                document.execCommand(event.target.getAttribute('data-action'), false);
-                break;
-            }
-            case 'SELECT': {
-                document.execCommand(
-                    event.target.getAttribute('data-action'), 
-                    false,
-                    event.target[event.target.selectedIndex].value
+            case 'BUTTON':
+                {
+                    document.execCommand(event.target.getAttribute('data-action'), false);
+                    break;
+                }
+            case 'SELECT':
+                {
+                    document.execCommand(
+                        event.target.getAttribute('data-action'),
+                        false,
+                        event.target[event.target.selectedIndex].value
                     );
-                // event.target.selectedIndex = 0;
-            }
+                }
         }
     }
-
-    
 
     destroy() {
         while (this.domElement.childElementCount) {
             this.domElement.childrens[0].remove();
         }
-        // remove class props
     }
 
     createDom() {
@@ -115,8 +110,29 @@ class TextEditor {
     }
 }
 
+let url = `https://api.datamuse.com/words?`,
+    type = 'rel_syn=';
+
 class Datamuse {
-    
+    constructor() {}
+    static getDatamuse(word, type) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", url + type + word);
+            xhr.onload = () => resolve(JSON.parse(xhr.responseText));
+            xhr.onerror = () => reject(xhr.statusText);
+            xhr.send();
+        });
+    }
 }
+
+Datamuse.getDatamuse('duck', type).then(
+    result => {
+        debugger;
+    },
+    error => {
+        debugger;
+    }
+)
 
 let texteditor = new TextEditor(document.querySelector('.texteditor'));
