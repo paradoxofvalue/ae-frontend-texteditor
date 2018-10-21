@@ -7,9 +7,7 @@ class TextEditor {
 
         this.editor = document.querySelector('.texteditor__editor');
 
-        this.domElement.addEventListener('input', this.delegateInput.bind(this));
         this.domElement.addEventListener('click', this.delegateEvents.bind(this));
-        this.domElement.addEventListener('dblclick', this.delegateEvents.bind(this));
         return this;
     }
 
@@ -41,71 +39,27 @@ class TextEditor {
         return allSelectedElements;
     }
 
-    delegateInput(event) {
-        switch (event.inputType) {
-            case 'insertParagraph':
-                {
-                    this.editor.innerHTML.replace('<div><br></div>', '');
-                    this.editor.innerHTML += '<br/>';
-                    break;
-                }
-            case 'deleteContentBackward':
-                {
-                    return event;
-                    break;
-                }
-            case 'insertText':
-                {
-                    if (!event.data || event.data == ' ') {
-                        return event;
-                    }
-                    this.editor.innerHTML += `<span>${event.data}</span>`;
-                    console.log(event.data);
-                    break;
-                }
-            case 'deleteContentBackward':
-                {
-                    return event;
-                    break;
-                }
-            case 'deleteContentForward':
-                {
-                    return event;
-                    break;
-                }
-            case 'insertFromPaste':
-                {
-                    debugger
-                    break;
-                }
-        }
 
-        this.moveCursorToEnd()
-    }
-
-
-    moveCursorToEnd() {
-        let range = document.createRange();
-        range.selectNodeContents(this.editor);
-        range.collapse(false);
-        let selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-    }
+    
 
     delegateEvents(event) {
-        if (event.target.tagName == 'BUTTON') {
-            let action = event.target.getAttribute('data-action');
-            let selection = this.getSelectionHtml();
-            let trigger = selection.every(letter => {
-                return letter.classList.contains(`text__${action}`)
-            })
-
-            selection.forEach(letter => {
-                trigger ? letter.classList.remove(`text__${action}`) : letter.classList.add(`text__${action}`);
-            })
+        switch (event.target.tagName) {
+            case 'BUTTON': {
+                document.execCommand(event.target.getAttribute('data-action'), false);
+                break;
+            }
+            case 'SELECT': {
+                document.execCommand(
+                    event.target.getAttribute('data-action'), 
+                    false,
+                    event.target[event.target.selectedIndex].value
+                    );
+                // event.target.selectedIndex = 0;
+            }
         }
     }
+
+    
 
     destroy() {
         while (this.domElement.childElementCount) {
@@ -136,6 +90,12 @@ class TextEditor {
             <button data-action="bold">B</button>
             <button data-action="italic">I</button>
             <button data-action="underline">U</button>
+            <select data-action="forecolor">
+                <option value="" selected>choose color</option>
+                <option value="black">Black</option>
+                <option value="red">Red</option>
+                <option value="blue">Blue</option>
+            </select>
         </div>
         `;
     }
@@ -155,5 +115,8 @@ class TextEditor {
     }
 }
 
+class Datamuse {
+    
+}
 
 let texteditor = new TextEditor(document.querySelector('.texteditor'));
